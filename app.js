@@ -1,6 +1,5 @@
-const SECRET_ADMIN_CODE = "123456789"; 
+const SECRET_ADMIN_CODE = "옵픈세사미123!"; 
 
-// 💾 페이지가 켜질 때, 이전에 저장된 API 키와 주소가 있다면 자동으로 불러옵니다.
 window.onload = function() {
     if(localStorage.getItem('groq_endpoint')) {
         document.getElementById('endpointInput').value = localStorage.getItem('groq_endpoint');
@@ -36,7 +35,6 @@ async function sendMessage() {
         return;
     }
 
-    // 💾 입력된 값을 브라우저에 안전하게 임시 저장합니다.
     localStorage.setItem('groq_endpoint', endpointInput);
     localStorage.setItem('groq_apikey', apiKeyInput);
 
@@ -56,19 +54,25 @@ async function sendMessage() {
                 'Authorization': `Bearer ${apiKeyInput}`
             },
             body: JSON.stringify({
-                model: "llama3-8b-8192", // 👈 기억해둔 모델로 확실하게 고정!
+                // 💡 400 에러를 피하기 위해 Groq의 최신 범용 무료 모델로 변경
+                model: "gemma2-9b-it", 
                 messages: [
                     { 
                         role: "system", 
                         content: "너는 학교 축제 귀신의 집 방에 참가자를 가둔 소름 돋는 악령이야. 문맥에 맞는 자연스러운 한국어로 대답하되, 기괴하고 서늘한 분위기를 풍기며 2~3문장 이내로 짧고 오싹하게 반말로 대답해줘." 
                     },
                     { role: "user", content: messageText }
-                ]
+                ],
+                // 안전을 위해 파라미터 추가
+                temperature: 0.7
             })
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP 에러! 상태코드: ${response.status}`);
+            // 에러 세부 원인을 알아내기 위해 서버의 답변을 읽어옴
+            const errorData = await response.json().catch(() => ({}));
+            const errorMsg = errorData.error?.message || `상태코드: ${response.status}`;
+            throw new Error(errorMsg);
         }
 
         const data = await response.json();
@@ -78,7 +82,8 @@ async function sendMessage() {
 
     } catch (error) {
         console.error(error);
-        appendMessage("시스템", "전송 실패... 무언가 잘못되었습니다.");
+        // 에러 원인을 화면에 직접 띄워주도록 수정
+        appendMessage("시스템", `전송 실패... 원인: ${error.message}`);
     }
 }
 
