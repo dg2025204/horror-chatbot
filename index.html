@@ -2,33 +2,96 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>공포 챗봇 축제 에디션</title>
     <style>
-        /* 공포 테마 스타일링 (어두운 분위기) */
-        body { background-color: #0d0d0d; color: #e50914; font-family: 'Courier New', monospace; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .settings, .chat-box { border: 1px solid #333; padding: 15px; margin-bottom: 20px; background: #141414; }
-        input, button { background: #222; color: #fff; border: 1px solid #444; padding: 8px; }
-        button:hover { background: #e50914; color: #000; cursor: pointer; }
-        .messages { height: 300px; overflow-y: auto; border-bottom: 1px solid #333; margin-bottom: 10px; padding: 10px; }
+        /* 어두운 공포 테마 스타일 */
+        body { 
+            background-color: #0d0d0d; 
+            color: #e50914; 
+            font-family: 'Courier New', monospace; 
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container { 
+            width: 100%;
+            max-width: 800px; /* 화면을 더 넓게 키움 */
+            background: #141414;
+            border: 2px solid #333;
+            box-shadow: 0 0 20px rgba(229, 9, 20, 0.2);
+            padding: 25px;
+            box-sizing: border-box;
+        }
+        /* 🤫 관리자 설정 창: 기본적으로 완전히 숨김 (display: none) */
+        .settings { 
+            display: none; 
+            border: 1px dashed #e50914; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            background: #222; 
+        }
+        .settings label { color: #fff; font-size: 14px; }
+        .settings input { width: 100%; background: #333; color: #fff; border: 1px solid #555; padding: 8px; margin-top: 5px; margin-bottom: 15px; box-sizing: border-box; }
+        
+        h2 { text-align: center; letter-spacing: 3px; text-shadow: 2px 2px 5px #000; margin-top: 0; }
+        
+        /* 💬 채팅창 크기 대폭 확대 */
+        .chat-box { display: flex; flex-direction: column; }
+        .messages { 
+            height: 500px; /* 대화창 높이를 500px로 크게 늘림 */
+            overflow-y: auto; 
+            border: 1px solid #333; 
+            background: #080808;
+            padding: 20px; 
+            margin-bottom: 15px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .input-area { display: flex; gap: 10px; }
+        .input-area input { 
+            flex: 1; 
+            background: #1c1c1c; 
+            color: #fff; 
+            border: 1px solid #444; 
+            padding: 15px; 
+            font-size: 16px; 
+        }
+        .input-area input:focus { border-color: #e50914; outline: none; }
+        .input-area button { 
+            background: #e50914; 
+            color: #000; 
+            border: none; 
+            padding: 0 30px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+        }
+        .input-area button:hover { background: #b30710; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>기괴한 챗봇 설정</h2>
-    <div class="settings">
-        <label>API 엔드포인트:</label><br>
-        <input type="text" id="endpointInput" placeholder="https://api.openai.com/v1" style="width: 100%;"><br><br>
-        <label>API 키:</label><br>
-        <input type="password" id="apiKeyInput" placeholder="sk-..." style="width: 100%;">
+    <div class="settings" id="adminSettings">
+        <h3 style="color: #fff; margin-top: 0;">🔮 관리자 시크릿 설정</h3>
+        <label>Groq 엔드포인트:</label>
+        <input type="text" id="endpointInput" value="https://api.groq.com/openai/v1">
+        <label>Groq API 키:</label>
+        <input type="password" id="apiKeyInput" placeholder="gsk_...">
+        <p style="color: #aaa; font-size: 12px; margin: 0;">* 다시 숨기려면 Ctrl + Shift + S를 누르세요.</p>
     </div>
 
-    <h2>채팅</h2>
+    <h2>[ 악령의 방 ]</h2>
     <div class="chat-box">
         <div class="messages" id="chatMessages"></div>
-        <input type="text" id="userInput" placeholder="메시지를 입력하세요..." style="width: 70%;">
-        <button onclick="sendMessage()">전송</button>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="메시지를 입력해라..." onkeypress="if(event.keyCode==13) sendMessage()">
+            <button onclick="sendMessage()">전송</button>
+        </div>
     </div>
 </div>
 
