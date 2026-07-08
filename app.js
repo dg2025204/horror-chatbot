@@ -10,11 +10,9 @@ async function sendMessage() {
         return;
     }
 
-    // 화면에 사용자 메시지 표시
     appendMessage("나", messageText);
     userInput.value = '';
 
-    // 엔드포인트 주소 자동 보정
     let targetUrl = endpointInput;
     if (!targetUrl.endsWith('/chat/completions')) {
         targetUrl = targetUrl.replace(/\/$/, '') + '/chat/completions';
@@ -25,15 +23,15 @@ async function sendMessage() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKeyInput}` // Groq API 키가 들어갑니다
+                'Authorization': `Bearer ${apiKeyInput}`
             },
             body: JSON.stringify({
-                // 🔥 Groq에서 지원하는 고성능 무료 모델로 변경했습니다.
-                model: "llama3-8b-8192", 
+                // 💡 한국어를 훨씬 더 매끄럽고 똑똑하게 잘하는 고성능 모델로 변경
+                model: "llama-3.3-70b-specdec", 
                 messages: [
                     { 
                         role: "system", 
-                        content: "너는 학교 축제 귀신의 집에서 탈출하려는 사람을 방해하는 기괴하고 서늘한 공포 챗봇이야. 짧고 소름 끼치는 말투로 대답해줘." 
+                        content: "너는 학교 축제 귀신의 집방에 갇힌 사람을 협박하고 괴롭히는 소름 돋는 악령이야. 문맥에 맞는 자연스러운 한국어로 대답하되, 절대로 친절하게 대하지 마. 오싹하고 기괴한 분위기를 풍기며 2~3문장 이내로 짧고 서늘하게 반말로 대답해." 
                     },
                     { role: "user", content: messageText }
                 ]
@@ -47,7 +45,8 @@ async function sendMessage() {
         const data = await response.json();
         const aiResponse = data.choices[0].message.content;
         
-        appendMessage("령(👻)", aiResponse);
+        // 💡 이름을 '령(👻)' 대신 조금 더 분위기 있게 '악령'으로 바꾸고 보기 편하게 수정
+        appendMessage("👻 악령", aiResponse);
 
     } catch (error) {
         console.error(error);
@@ -58,7 +57,8 @@ async function sendMessage() {
 function appendMessage(sender, text) {
     const chatMessages = document.getElementById('chatMessages');
     const msgDiv = document.createElement('div');
-    msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
+    // 💡 이름과 내용 사이에 줄바꿈(<br>)을 넣어서 가독성을 높임
+    msgDiv.innerHTML = `<strong style="color: #ff3333;">[${sender}]</strong><br>${text}<br><br>`;
     chatMessages.appendChild(msgDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
