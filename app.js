@@ -29,7 +29,7 @@ async function sendMessage() {
             },
             body: JSON.stringify({
                 // 🔥 Groq에서 지원하는 고성능 무료 모델로 변경했습니다.
-                model: "llama-3.3-70b-versatile", 
+                model: "llama3-8b-8192", 
                 messages: [
                     { 
                         role: "system", 
