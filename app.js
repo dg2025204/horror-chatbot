@@ -1,4 +1,4 @@
-const SECRET_ADMIN_CODE = "123456789"; 
+const SECRET_ADMIN_CODE = "1234"; // 👈 관리자 코드를 1234로 변경했습니다!
 
 window.onload = function() {
     if(localStorage.getItem('groq_endpoint')) {
@@ -17,9 +17,10 @@ async function sendMessage() {
 
     if (!messageText) return;
 
+    // 🔑 채팅창에 1234를 치면 설정창 온오프
     if (messageText === SECRET_ADMIN_CODE) {
         const settingsDiv = document.getElementById('adminSettings');
-        if (settingsDiv.style.style.display === 'block' || settingsDiv.style.display === 'block') {
+        if (settingsDiv.style.display === 'block') {
             settingsDiv.style.display = 'none';
             alert("관리자 설정창을 숨겼습니다.");
         } else {
@@ -31,7 +32,7 @@ async function sendMessage() {
     }
 
     if (!endpointInput || !apiKeyInput) {
-        alert("관리자 설정을 먼저 완료해주세요! (비밀 코드를 채팅창에 입력)");
+        alert("관리자 설정을 먼저 완료해주세요! (채팅창에 1234 입력)");
         return;
     }
 
@@ -41,15 +42,14 @@ async function sendMessage() {
     appendMessage("나", messageText);
     userInput.value = '';
 
-    // 엔드포인트 주소 끝에 슬래시와 경로 완벽 정리
     let targetUrl = endpointInput.replace(/\/$/, "");
     if (!targetUrl.endsWith('/chat/completions')) {
         targetUrl += '/chat/completions';
     }
 
-    // 전송할 데이터 구조 (Groq 표준 규격)
+    // 💡 400 에러를 방지하기 위해 구조를 최대로 압축한 안전한 규격
     const requestBody = {
-        model: "gemma2-9b-it", // 현재 가라앉지 않고 잘 작동하는 기본 모델
+        model: "gemma2-9b-it", 
         messages: [
             { 
                 role: "user", 
@@ -69,7 +69,7 @@ async function sendMessage() {
         });
 
         if (!response.ok) {
-            // 400 에러의 실제 원인을 텍스트로 강제 파싱해서 확인
+            // 💡 400 에러의 진짜 이유를 텍스트로 읽어와 화면에 뿌립니다.
             const errorText = await response.text();
             throw new Error(`상태코드 ${response.status}: ${errorText}`);
         }
@@ -81,6 +81,7 @@ async function sendMessage() {
 
     } catch (error) {
         console.error(error);
+        // 에러 원인이 콘솔이 아니라 화면에 무조건 찍히도록 변경
         appendMessage("시스템", `전송 실패... 원인: ${error.message}`);
     }
 }
