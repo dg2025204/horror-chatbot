@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>공포 챗봇 축제 에디션</title>
+    <style>
+        /* 공포 테마 스타일링 (어두운 분위기) */
+        body { background-color: #0d0d0d; color: #e50914; font-family: 'Courier New', monospace; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .settings, .chat-box { border: 1px solid #333; padding: 15px; margin-bottom: 20px; background: #141414; }
+        input, button { background: #222; color: #fff; border: 1px solid #444; padding: 8px; }
+        button:hover { background: #e50914; color: #000; cursor: pointer; }
+        .messages { height: 300px; overflow-y: auto; border-bottom: 1px solid #333; margin-bottom: 10px; padding: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>기괴한 챗봇 설정</h2>
+    <div class="settings">
+        <label>API 엔드포인트:</label><br>
+        <input type="text" id="endpointInput" placeholder="https://api.openai.com/v1" style="width: 100%;"><br><br>
+        <label>API 키:</label><br>
+        <input type="password" id="apiKeyInput" placeholder="sk-..." style="width: 100%;">
+    </div>
+
+    <h2>채팅</h2>
+    <div class="chat-box">
+        <div class="messages" id="chatMessages"></div>
+        <input type="text" id="userInput" placeholder="메시지를 입력하세요..." style="width: 70%;">
+        <button onclick="sendMessage()">전송</button>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
