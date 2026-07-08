@@ -1,14 +1,5 @@
-// 🤫 비밀 단축키 기능: Ctrl + Shift + S 를 누르면 설정창이 켜지고 꺼집니다.
-window.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 's') {
-        const settingsDiv = document.getElementById('adminSettings');
-        if (settingsDiv.style.display === 'block') {
-            settingsDiv.style.display = 'none';
-        } else {
-            settingsDiv.style.display = 'block';
-        }
-    }
-});
+// 🤫 관리자 설정창을 여는 비밀 코드 (원하는 단어로 바꿔도 돼!)
+const SECRET_ADMIN_CODE = "123456789"; 
 
 async function sendMessage() {
     const endpointInput = document.getElementById('endpointInput').value.trim();
@@ -17,8 +8,24 @@ async function sendMessage() {
     const messageText = userInput.value.trim();
 
     if (!messageText) return;
+
+    // 🔑 사용자가 채팅창에 비밀 코드를 입력했을 때 처리
+    if (messageText === SECRET_ADMIN_CODE) {
+        const settingsDiv = document.getElementById('adminSettings');
+        if (settingsDiv.style.display === 'block') {
+            settingsDiv.style.display = 'none';
+            alert("관리자 설정창을 숨겼습니다.");
+        } else {
+            settingsDiv.style.display = 'block';
+            alert("관리자 설정창이 활성화되었습니다!");
+        }
+        userInput.value = ''; // 입력창 비우기
+        return; // AI에게 메시지를 보내지 않고 여기서 함수 종료
+    }
+
+    // 일반 채팅일 때 API 설정 체크
     if (!endpointInput || !apiKeyInput) {
-        alert("시크릿 창을 열어 API 엔드포인트와 키를 입력해주세요! (단축키: Ctrl+Shift+S)");
+        alert("관리자 설정을 먼저 완료해주세요! (비밀 코드를 채팅창에 입력)");
         return;
     }
 
@@ -56,7 +63,6 @@ async function sendMessage() {
         const data = await response.json();
         const aiResponse = data.choices[0].message.content;
         
-        // 👻 확실하게 이름 출력부를 고정시켰습니다.
         appendMessage("👻 악령", aiResponse);
 
     } catch (error) {
