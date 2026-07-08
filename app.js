@@ -1,4 +1,4 @@
-const SECRET_ADMIN_CODE = "1234"; // 👈 관리자 코드를 1234로 변경했습니다!
+const SECRET_ADMIN_CODE = "1234"; 
 
 window.onload = function() {
     if(localStorage.getItem('groq_endpoint')) {
@@ -17,7 +17,6 @@ async function sendMessage() {
 
     if (!messageText) return;
 
-    // 🔑 채팅창에 1234를 치면 설정창 온오프
     if (messageText === SECRET_ADMIN_CODE) {
         const settingsDiv = document.getElementById('adminSettings');
         if (settingsDiv.style.display === 'block') {
@@ -47,9 +46,9 @@ async function sendMessage() {
         targetUrl += '/chat/completions';
     }
 
-    // 💡 400 에러를 방지하기 위해 구조를 최대로 압축한 안전한 규격
     const requestBody = {
-        model: "gemma2-9b-it", 
+        // 💡 현재 Groq에서 공식적으로 지원하는 무료 대형 모델로 변경했습니다.
+        model: "llama-3.3-70b-versatile", 
         messages: [
             { 
                 role: "user", 
@@ -69,7 +68,6 @@ async function sendMessage() {
         });
 
         if (!response.ok) {
-            // 💡 400 에러의 진짜 이유를 텍스트로 읽어와 화면에 뿌립니다.
             const errorText = await response.text();
             throw new Error(`상태코드 ${response.status}: ${errorText}`);
         }
@@ -81,7 +79,6 @@ async function sendMessage() {
 
     } catch (error) {
         console.error(error);
-        // 에러 원인이 콘솔이 아니라 화면에 무조건 찍히도록 변경
         appendMessage("시스템", `전송 실패... 원인: ${error.message}`);
     }
 }
