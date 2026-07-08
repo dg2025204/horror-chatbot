@@ -1,4 +1,4 @@
-const SECRET_ADMIN_CODE = "옵픈세사미123!"; 
+const SECRET_ADMIN_CODE = "123456789"; 
 
 window.onload = function() {
     if(localStorage.getItem('groq_endpoint')) {
@@ -19,7 +19,7 @@ async function sendMessage() {
 
     if (messageText === SECRET_ADMIN_CODE) {
         const settingsDiv = document.getElementById('adminSettings');
-        if (settingsDiv.style.display === 'block') {
+        if (settingsDiv.style.style.display === 'block' || settingsDiv.style.display === 'block') {
             settingsDiv.style.display = 'none';
             alert("관리자 설정창을 숨겼습니다.");
         } else {
@@ -41,10 +41,22 @@ async function sendMessage() {
     appendMessage("나", messageText);
     userInput.value = '';
 
-    let targetUrl = endpointInput;
+    // 엔드포인트 주소 끝에 슬래시와 경로 완벽 정리
+    let targetUrl = endpointInput.replace(/\/$/, "");
     if (!targetUrl.endsWith('/chat/completions')) {
-        targetUrl = targetUrl.replace(/\/$/, '') + '/chat/completions';
+        targetUrl += '/chat/completions';
     }
+
+    // 전송할 데이터 구조 (Groq 표준 규격)
+    const requestBody = {
+        model: "gemma2-9b-it", // 현재 가라앉지 않고 잘 작동하는 기본 모델
+        messages: [
+            { 
+                role: "user", 
+                content: `너는 학교 축제 귀신의 집 방에 참가자를 가둔 서늘한 악령이야. 상대방의 말에 기괴하고 서늘한 분위기를 풍기며 2~3문장 이내로 짧고 오싹하게 반말로 대답해줘. 상대방의 메시지: ${messageText}` 
+            }
+        ]
+    };
 
     try {
         const response = await fetch(targetUrl, {
@@ -53,26 +65,13 @@ async function sendMessage() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${apiKeyInput}`
             },
-            body: JSON.stringify({
-                // 💡 400 에러를 피하기 위해 Groq의 최신 범용 무료 모델로 변경
-                model: "gemma2-9b-it", 
-                messages: [
-                    { 
-                        role: "system", 
-                        content: "너는 학교 축제 귀신의 집 방에 참가자를 가둔 소름 돋는 악령이야. 문맥에 맞는 자연스러운 한국어로 대답하되, 기괴하고 서늘한 분위기를 풍기며 2~3문장 이내로 짧고 오싹하게 반말로 대답해줘." 
-                    },
-                    { role: "user", content: messageText }
-                ],
-                // 안전을 위해 파라미터 추가
-                temperature: 0.7
-            })
+            body: JSON.stringify(requestBody)
         });
 
         if (!response.ok) {
-            // 에러 세부 원인을 알아내기 위해 서버의 답변을 읽어옴
-            const errorData = await response.json().catch(() => ({}));
-            const errorMsg = errorData.error?.message || `상태코드: ${response.status}`;
-            throw new Error(errorMsg);
+            // 400 에러의 실제 원인을 텍스트로 강제 파싱해서 확인
+            const errorText = await response.text();
+            throw new Error(`상태코드 ${response.status}: ${errorText}`);
         }
 
         const data = await response.json();
@@ -82,7 +81,6 @@ async function sendMessage() {
 
     } catch (error) {
         console.error(error);
-        // 에러 원인을 화면에 직접 띄워주도록 수정
         appendMessage("시스템", `전송 실패... 원인: ${error.message}`);
     }
 }
