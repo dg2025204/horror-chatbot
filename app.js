@@ -45,7 +45,7 @@ async function sendMessage() {
                 'Authorization': `Bearer ${apiKeyInput}`
             },
             body: JSON.stringify({
-                model: "llama-3.3-70b-specdec", 
+                model: "llama3-8b-8192", 
                 messages: [
                     { 
                         role: "system", 
