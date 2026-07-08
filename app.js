@@ -1,5 +1,14 @@
-// 🤫 관리자 설정창을 여는 비밀 코드 (원하는 단어로 바꿔도 돼!)
 const SECRET_ADMIN_CODE = "123456789"; 
+
+// 💾 페이지가 켜질 때, 이전에 저장된 API 키와 주소가 있다면 자동으로 불러옵니다.
+window.onload = function() {
+    if(localStorage.getItem('groq_endpoint')) {
+        document.getElementById('endpointInput').value = localStorage.getItem('groq_endpoint');
+    }
+    if(localStorage.getItem('groq_apikey')) {
+        document.getElementById('apiKeyInput').value = localStorage.getItem('groq_apikey');
+    }
+}
 
 async function sendMessage() {
     const endpointInput = document.getElementById('endpointInput').value.trim();
@@ -9,7 +18,6 @@ async function sendMessage() {
 
     if (!messageText) return;
 
-    // 🔑 사용자가 채팅창에 비밀 코드를 입력했을 때 처리
     if (messageText === SECRET_ADMIN_CODE) {
         const settingsDiv = document.getElementById('adminSettings');
         if (settingsDiv.style.display === 'block') {
@@ -19,15 +27,18 @@ async function sendMessage() {
             settingsDiv.style.display = 'block';
             alert("관리자 설정창이 활성화되었습니다!");
         }
-        userInput.value = ''; // 입력창 비우기
-        return; // AI에게 메시지를 보내지 않고 여기서 함수 종료
+        userInput.value = '';
+        return;
     }
 
-    // 일반 채팅일 때 API 설정 체크
     if (!endpointInput || !apiKeyInput) {
         alert("관리자 설정을 먼저 완료해주세요! (비밀 코드를 채팅창에 입력)");
         return;
     }
+
+    // 💾 입력된 값을 브라우저에 안전하게 임시 저장합니다.
+    localStorage.setItem('groq_endpoint', endpointInput);
+    localStorage.setItem('groq_apikey', apiKeyInput);
 
     appendMessage("나", messageText);
     userInput.value = '';
@@ -45,7 +56,7 @@ async function sendMessage() {
                 'Authorization': `Bearer ${apiKeyInput}`
             },
             body: JSON.stringify({
-                model: "llama3-8b-8192", 
+                model: "llama3-8b-8192", // 👈 기억해둔 모델로 확실하게 고정!
                 messages: [
                     { 
                         role: "system", 
