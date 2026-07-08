@@ -14,8 +14,7 @@ async function sendMessage() {
     appendMessage("나", messageText);
     userInput.value = '';
 
-    // 친구가 요청한 OpenAI Compatible 규격으로 주소 조립
-    // 사용자가 입력한 엔드포인트 끝에 /chat/completions가 없다면 붙여줍니다.
+    // 엔드포인트 주소 자동 보정
     let targetUrl = endpointInput;
     if (!targetUrl.endsWith('/chat/completions')) {
         targetUrl = targetUrl.replace(/\/$/, '') + '/chat/completions';
@@ -26,10 +25,11 @@ async function sendMessage() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKeyInput}` // 입력받은 API 키 사용
+                'Authorization': `Bearer ${apiKeyInput}` // Groq API 키가 들어갑니다
             },
             body: JSON.stringify({
-                model: "gpt-4o-mini", // 혹은 엔드포인트가 지원하는 모델명 (예: gpt-3.5-turbo 등)
+                // 🔥 Groq에서 지원하는 고성능 무료 모델로 변경했습니다.
+                model: "llama-3.3-70b-versatile", 
                 messages: [
                     { 
                         role: "system", 
@@ -47,7 +47,6 @@ async function sendMessage() {
         const data = await response.json();
         const aiResponse = data.choices[0].message.content;
         
-        // 화면에 챗봇 답변 표시
         appendMessage("령(👻)", aiResponse);
 
     } catch (error) {
@@ -61,5 +60,5 @@ function appendMessage(sender, text) {
     const msgDiv = document.createElement('div');
     msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
     chatMessages.appendChild(msgDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight; // 스크롤 맨 아래로
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
