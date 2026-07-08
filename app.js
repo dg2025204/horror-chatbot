@@ -46,17 +46,21 @@ async function sendMessage() {
         targetUrl += '/chat/completions';
     }
 
-    const requestBody = {
-        // 💡 현재 Groq에서 공식적으로 지원하는 무료 대형 모델로 변경했습니다.
+const requestBody = {
         model: "llama-3.3-70b-versatile", 
         messages: [
             { 
                 role: "user", 
-                content: `너는 학교 축제 귀신의 집 방에 참가자를 가둔 서늘한 악령이야. 상대방의 말에 기괴하고 서늘한 분위기를 풍기며 2~3문장 이내로 짧고 오싹하게 반말로 대답해줘. 상대방의 메시지: ${messageText}` 
+                content: `너는 학교 축제 귀신의 집 방에 참가자를 가두고 영혼을 갉아먹는 잔혹하고 사악한 악령이야. 
+                아래 규칙을 절대적으로 지켜서 대답해라.
+                1. 절대로 친절하게 대하지 말고, 비웃거나 협박하는 태도를 취해라.
+                2. 기괴한 웃음소리(크크크, 흐흐흐...)나 서늘한 묘사(네 뒤에 있는 게 보이나?, 피비린내가 진동하네 등)를 적극적으로 섞어라.
+                3. 반말로 2~3문장 이내로 짧고 오싹하게 대답해라.
+                
+                상대방의 메시지: ${messageText}` 
             }
         ]
     };
-
     try {
         const response = await fetch(targetUrl, {
             method: 'POST',
