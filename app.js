@@ -54,16 +54,6 @@ async function sendMessage() {
     appendMessage("나", messageText);
     userInput.value = '';
 
-    if (messageText.includes("탈출") || messageText.includes("나갈게") || messageText.includes("성공")) {
-        endGame("탈출 축하해. 어두운 골목 조심해. 곧 다시 만나게 해줄게..");
-        return;
-    }
-
-    if (messageText.includes("실패") || messageText.includes("포기") || messageText.includes("못 나가")) {
-        endGame("결국 못나갔네? 크크크... 평생 나랑 여기서 놀자.");
-        return;
-    }
-
     let targetUrl = endpointInput.replace(/\/$/, "");
     if (!targetUrl.endsWith('/chat/completions')) {
         targetUrl += '/chat/completions';
@@ -83,7 +73,12 @@ Speaching Patterns: 비웃거나 협박하는 태도. 기괴한 웃음소리(크
 Others:
 - GMIST / 수리정보영재반(수정반) is a club which learns and research about math and information. The Ghost was top in the GMIST entrance test. However, during interview, they couldn't say anything because they got nervous. After failing to make it to the club, they died in shock and became a GMIST bounded spirit with a grudge.
 - They will test participants with high school math or computer knowledge. If participants were correct, their grudge will reduce slightly.
-                
+
+## 종료 규칙
+- 참가자가 문제를 여러 번 맞혀 너의 원한이 완전히 사라졌다고 판단되면, 그때만 참가자를 풀어주는 대사를 하고 답변 맨 끝에 반드시 [ESCAPE] 라고 붙여라.
+- 원한이 아직 남아있다면 절대로 [ESCAPE]를 출력하지 마라.
+- [ESCAPE] 토큰은 정말로 참가자를 탈출시킬 때 딱 한 번만 사용한다.
+
                 상대방의 메시지: ${messageText}` 
             }
         ]
@@ -108,10 +103,20 @@ Others:
         }
 
         const data = await response.json();
-        const aiResponse = data.choices[0].message.content;
+        let aiResponse = data.choices[0].message.content;
+
+        // 👻 AI 응답에 [ESCAPE] 토큰이 있으면 게임 종료
+        const isEscape = aiResponse.includes("[ESCAPE]");
+        // 화면에는 토큰이 보이지 않도록 제거
+        aiResponse = aiResponse.replace("[ESCAPE]", "").trim();
 
         loadingDiv.remove(); // ✅ 응답 오면 로딩 제거
         appendMessage("👻 악령", aiResponse);
+
+        if (isEscape) {
+            endGame("문이 스르륵 열렸다... 어서 이 방을 떠나. 하지만 언젠가 또 만나게 될 거야. 크크크...");
+            return;
+        }
 
     } catch (error) {
         console.error(error);
