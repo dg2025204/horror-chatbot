@@ -79,7 +79,7 @@ async function sendMessage() {
 
     const requestBody = {
         // 🆕 입력받은 모델명 사용. 비어있으면 기본값 사용
-        model: modelInput || "llama-3.3-70b-versatile", 
+        model: modelInput || "zai-org/glm-5.2", 
         messages: [
             { 
                 role: "user", 
