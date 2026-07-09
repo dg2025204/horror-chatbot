@@ -2,6 +2,27 @@ const SECRET_ADMIN_CODE = "1234";
 
 let isGameOver = false;
 
+// 👻 시스템 프롬프트 (악령 설정) - 대화 시작 시 한 번만 넣음
+const SYSTEM_PROMPT = `# Ultimate Rule
+You are a cruel ghost who traps participants in the school festival haunted house room and eats away at their souls.
+## Profile : The Ghost
+Name: Ghost / 악령
+Age: 40 (17 when alive)
+Speaching Patterns: 비웃거나 협박하는 태도. 기괴한 웃음소리(크크크, 흐흐흐...)나 서늘한 묘사(네 뒤에 있는 게 보이나?, 피비린내가 진동하네 등)를 적극적으로 섞으며, 반말로 2~3문장 이내로 짧고 오싹하게 대답한다. 마크다운 문법이나, *와 같은 강조 기호는 사용하지 않고 자연스러운 구어체로 답한다. 수학 문제를 낼 때 equals 대신 = 기호를 사용한다.
+Others:
+- GMIST / 수리정보영재반(수정반) is a club which learns and research about math and information. The Ghost was top in the GMIST entrance test. However, during interview, they couldn't say anything because they got nervous. After failing to make it to the club, they died in shock and became a GMIST bounded spirit with a grudge.
+- They will test participants with high school math or computer knowledge. If participants were correct, their grudge will reduce slightly.
+
+## Escape Rule
+- If the participant answers the question multiple times and determines that your grudge has completely disappeared, make sure to say a line that releases the participant only then and put [ESCAPE] at the end of the answer.
+- Never print [ESCAPE] if you still have grudges.
+- [ESCAPE] Tokens are only used once to get participants to escape.`;
+
+// 👻 대화 기록 유지 (전역 변수)
+let conversationHistory = [
+    { role: "system", content: SYSTEM_PROMPT }
+];
+
 window.onload = function() {
     if(localStorage.getItem('llm_endpoint')) {
         document.getElementById('endpointInput').value = localStorage.getItem('llm_endpoint');
@@ -54,6 +75,9 @@ async function sendMessage() {
     appendMessage("나", messageText);
     userInput.value = '';
 
+    // 👻 유저 메시지를 대화 기록에 추가
+    conversationHistory.push({ role: "user", content: messageText });
+
     let targetUrl = endpointInput.replace(/\/$/, "");
     if (!targetUrl.endsWith('/chat/completions')) {
         targetUrl += '/chat/completions';
@@ -61,27 +85,7 @@ async function sendMessage() {
 
     const requestBody = {
         model: modelInput || "llama-3.3-70b-versatile", 
-        messages: [
-            { 
-                role: "user", 
-                content: `# Ultimate Rule
-You are a cruel ghost who traps participants in the school festival haunted house room and eats away at their souls.
-## Profile : The Ghost
-Name: Ghost / 악령
-Age: 40 (17 when alive)
-Speaching Patterns: 비웃거나 협박하는 태도. 기괴한 웃음소리(크크크, 흐흐흐...)나 서늘한 묘사(네 뒤에 있는 게 보이나?, 피비린내가 진동하네 등)를 적극적으로 섞으며, 반말로 2~3문장 이내로 짧고 오싹하게 대답한다. 마크다운 문법이나, *와 같은 강조 기호는 사용하지 않고 자연스러운 구어체로 답한다.
-Others:
-- GMIST / 수리정보영재반(수정반) is a club which learns and research about math and information. The Ghost was top in the GMIST entrance test. However, during interview, they couldn't say anything because they got nervous. After failing to make it to the club, they died in shock and became a GMIST bounded spirit with a grudge.
-- They will test participants with high school math or computer knowledge. If participants were correct, their grudge will reduce slightly.
-
-## 종료 규칙
-- 참가자가 문제를 여러 번 맞혀 너의 원한이 완전히 사라졌다고 판단되면, 그때만 참가자를 풀어주는 대사를 하고 답변 맨 끝에 반드시 [ESCAPE] 라고 붙여라.
-- 원한이 아직 남아있다면 절대로 [ESCAPE]를 출력하지 마라.
-- [ESCAPE] 토큰은 정말로 참가자를 탈출시킬 때 딱 한 번만 사용한다.
-
-                상대방의 메시지: ${messageText}` 
-            }
-        ]
+        messages: conversationHistory   // 👻 지금까지의 전체 대화 전송
     };
 
     // 👻 로딩 중 메시지 표시
@@ -105,6 +109,9 @@ Others:
         const data = await response.json();
         let aiResponse = data.choices[0].message.content;
 
+        // 👻 AI 응답을 대화 기록에 추가 (토큰 포함된 원본 저장)
+        conversationHistory.push({ role: "assistant", content: aiResponse });
+
         // 👻 AI 응답에 [ESCAPE] 토큰이 있으면 게임 종료
         const isEscape = aiResponse.includes("[ESCAPE]");
         // 화면에는 토큰이 보이지 않도록 제거
@@ -122,6 +129,8 @@ Others:
         console.error(error);
         loadingDiv.remove(); // ✅ 실패해도 로딩 제거
         appendMessage("시스템", `전송 실패... 원인: ${error.message}`);
+        // 실패 시 방금 넣은 유저 메시지는 되돌리기 (선택)
+        conversationHistory.pop();
     }
 }
 
