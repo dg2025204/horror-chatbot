@@ -72,7 +72,7 @@ async function sendMessage() {
     }
 
     const requestBody = {
-        model: "llama-3.3-70b-versatile", 
+        model: "zai-org/glm-5.2", 
         messages: [
             { 
                 role: "user", 
