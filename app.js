@@ -4,11 +4,15 @@ const SECRET_ADMIN_CODE = "1234";
 let isGameOver = false; // 게임이 끝났는지 체크 (성공/실패 시 true)
 
 window.onload = function() {
-    if(localStorage.getItem('groq_endpoint')) {
-        document.getElementById('endpointInput').value = localStorage.getItem('groq_endpoint');
+    if(localStorage.getItem('llm_endpoint')) {
+        document.getElementById('endpointInput').value = localStorage.getItem('llm_endpoint');
     }
-    if(localStorage.getItem('groq_apikey')) {
-        document.getElementById('apiKeyInput').value = localStorage.getItem('groq_apikey');
+    if(localStorage.getItem('llm_apikey')) {
+        document.getElementById('apiKeyInput').value = localStorage.getItem('llm_apikey');
+    }
+    // 🆕 모델명도 저장된 값 불러오기
+    if(localStorage.getItem('llm_model')) {
+        document.getElementById('modelInput').value = localStorage.getItem('llm_model');
     }
     
     // 👻 게임 시작 시 악령이 먼저 상황을 설명하는 대사를 띄웁니다.
@@ -23,6 +27,7 @@ async function sendMessage() {
 
     const endpointInput = document.getElementById('endpointInput').value.trim();
     const apiKeyInput = document.getElementById('apiKeyInput').value.trim();
+    const modelInput = document.getElementById('modelInput').value.trim(); // 🆕 모델명 입력받기
     const userInput = document.getElementById('userInput');
     const messageText = userInput.value.trim();
 
@@ -47,8 +52,9 @@ async function sendMessage() {
         return;
     }
 
-    localStorage.setItem('groq_endpoint', endpointInput);
-    localStorage.setItem('groq_apikey', apiKeyInput);
+    localStorage.setItem('llm_endpoint', endpointInput);
+    localStorage.setItem('llm_apikey', apiKeyInput);
+    localStorage.setItem('llm_model', modelInput); // 🆕 모델명 저장
 
     appendMessage("나", messageText);
     userInput.value = '';
@@ -72,7 +78,8 @@ async function sendMessage() {
     }
 
     const requestBody = {
-        model: "zai-org/glm-5.2", 
+        // 🆕 입력받은 모델명 사용. 비어있으면 기본값 사용
+        model: modelInput || "llama-3.3-70b-versatile", 
         messages: [
             { 
                 role: "user", 
@@ -118,11 +125,9 @@ async function sendMessage() {
 function endGame(finalMessage) {
     isGameOver = true;
     
-    // 악령의 최종 대사 출력
     setTimeout(() => {
         appendMessage("👻 악령", finalMessage);
         
-        // HTML 입력창과 버튼을 못 쓰게 비활성화(disabled) 처리
         const userInput = document.getElementById('userInput');
         const sendButton = document.querySelector('.input-area button');
         
@@ -132,7 +137,7 @@ function endGame(finalMessage) {
         }
         if (sendButton) {
             sendButton.disabled = true;
-            sendButton.style.background = "#555"; // 버튼 색상도 어둡게 변경
+            sendButton.style.background = "#555";
         }
     }, 800);
 }
