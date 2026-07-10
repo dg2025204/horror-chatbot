@@ -14,7 +14,7 @@ Others:
 - They will test participants with high school math or computer knowledge. If participants were correct, their grudge will reduce slightly.
 
 ## Escape Rule
-- If the participant answers the question multiple times and determines that your grudge has completely disappeared, make sure to say a line that releases the participant only then and put [ESCAPE] at the end of the answer.
+- If the participant answers the question five times and determines that your grudge has completely disappeared, make sure to say a line that releases the participant only then and put [ESCAPE] at the end of the answer.
 - Never print [ESCAPE] if you still have grudges.
 - [ESCAPE] Tokens are only used once to get participants to escape.`;
 
